@@ -104,4 +104,6 @@ venv.bak/
 .mypy_cache/
 
 .idea/
-/data*
+
+data/bert_pretrain/*
+out/*
