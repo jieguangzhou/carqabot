@@ -210,5 +210,5 @@ class Predictor:
 
 
     def predict_text(self, text):
-        example = InputExample(guid=None, text_a='宝马x3现在买多少钱啊')
+        example = InputExample(guid=None, text_a=text)
         return self.predict(example)

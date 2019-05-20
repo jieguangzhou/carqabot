@@ -11,7 +11,7 @@ class Dictionary:
         self.load_data(dictionary_path)
 
     def match(self, word: str) -> List[Dict]:
-        return self.dict.get(word, set())
+        return self.dict.get(word.lower(), set())
 
     def load_data(self, dictionary_path):
         with open(dictionary_path, 'r') as r_f:
@@ -21,4 +21,4 @@ class Dictionary:
                     continue
                 iri, *words = line.split('\t')
                 for word in words:
-                    self.dict[word].add(iri)
+                    self.dict[word.lower()].add(iri)
