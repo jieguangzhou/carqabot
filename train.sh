@@ -1,4 +1,3 @@
-
 python bert_script/run_text_classifier.py \
   --cache_dir ./data/bert_pretrain \
   --do_train \
