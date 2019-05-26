@@ -6,6 +6,7 @@ import torch
 
 from pytorch_pretrained_bert import BertConfig, BertForSequenceClassification, BertTokenizer
 
+is_main = __name__ == '__main__'
 logger = getLogger('bert_tc')
 PROCESSOR_NAME = 'Processor.pkl'
 
@@ -82,7 +83,7 @@ class PredicateClassificationProcessor:
 
         features = []
         for (ex_index, example) in enumerate(examples):
-            if ex_index % 10000 == 0:
+            if ex_index % 10000 == 0 and is_main:
                 logger.info("Writing example %d of %d" % (ex_index, len(examples)))
 
             tokens_a = tokenizer.tokenize(example.text_a)
@@ -142,7 +143,7 @@ class PredicateClassificationProcessor:
 
             label_id = label_map.get(example.label)
 
-            if ex_index < 5:
+            if ex_index < 5 and is_main:
                 logger.info("*** Example ***")
                 logger.info("guid: %s" % (example.guid))
                 logger.info("tokens: %s" % " ".join(

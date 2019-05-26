@@ -1,11 +1,14 @@
+from logging import getLogger
+
 from kbqa.relation.relation_recognition import RelationClassifier
 from kbqa.relation.relation_mapping import RelationMapping
 
+logger = getLogger('relation')
 
 class Relation:
-    def __init__(self, relation_classifier_model_path, dictionary_dir):
-        self.relation_classifier = RelationClassifier(relation_classifier_model_path)
-        self.relation_mapping = RelationMapping(dictionary_dir)
+    def __init__(self):
+        self.relation_classifier = RelationClassifier()
+        self.relation_mapping = RelationMapping()
 
     def predict(self, text):
         relation, confidence = self.relation_classifier.predict(text)

@@ -41,6 +41,7 @@ from pytorch_pretrained_bert.modeling import BertForSequenceClassification, Bert
 from pytorch_pretrained_bert.tokenization import BertTokenizer
 from pytorch_pretrained_bert.optimization import BertAdam, WarmupLinearSchedule
 import sys
+
 sys.path.append('.')
 from model import text_classification
 
@@ -206,7 +207,6 @@ def main():
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
 
-
     labels = ['上市时间', '中央差速器结构', '供油方式',
               '前制动器类型', '前悬架类型', '前电动机最大功率',
               '前轮胎规格', '前轮距', '助力类型', '厂商指导价',
@@ -224,7 +224,8 @@ def main():
               '缸径', '缸盖材料', '能源类型', '行李厢容积',
               '轴距', '进气形式', '长*宽*高', '长度',
               '驱动方式', '高度']
-    processor = text_classification.PredicateClassificationProcessor(labels, text_a_key='question', label_key='predicate')
+    processor = text_classification.PredicateClassificationProcessor(labels, text_a_key='question',
+                                                                     label_key='predicate')
 
     label_list = processor.labels
     num_labels = len(label_list)
