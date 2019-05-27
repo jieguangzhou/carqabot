@@ -9,3 +9,5 @@ class Path:
     kg = os.path.join(data_path, 'kg', 'car.ttl')
     ner_model = os.path.join(data_path, 'model', 'ner')
     relation_classifier_model = os.path.join(data_path, 'model', 'kbqapc')
+
+    sample_question = os.path.join(data_path, 'sample_question')

@@ -12,8 +12,8 @@ class KGStatus(BaseStatus):
         self.status = []
 
     def add(self, entity=None, relation=None):
-        entity = entity or self.history_entity
-        relation = relation or self.history_relation
+        entity = entity or self.last_entity
+        relation = relation or self.last_relation
         status = {
             'entity': entity,
             'relation': relation
@@ -53,10 +53,27 @@ class DPStatus(BaseStatus):
         return policy
 
 
+class NLGStatus(BaseStatus):
+    def __init__(self):
+        self.status = []
+
+    def add(self, nlg_result):
+        self.status.append(nlg_result)
+
+    @property
+    def last_status(self):
+        if self.status:
+            status = self.status[-1]
+        else:
+            status = None
+        return status
+
+
 class DMStatus(BaseStatus):
     def __init__(self):
         self.kb_status = KGStatus()
         self.dp_status = DPStatus()
+        self.nlg_status = NLGStatus()
 
 
 class UserStatusManager:

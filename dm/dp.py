@@ -4,6 +4,7 @@ from dm.status import DMStatus
 class Action:
     inform = 'inform'
     choose = 'choose'
+    guide = 'guide'
 
 
 class Policy:
@@ -14,6 +15,9 @@ class Policy:
 
     def __str__(self):
         return str(self.__dict__)
+
+    def __bool__(self):
+        return not self.action == ''
 
 
 class BaseDP:
@@ -27,14 +31,19 @@ class BaseDP:
 class FirstDP(BaseDP):
     def predict(self, nlu_result, status: DMStatus) -> Policy:
         if nlu_result:
-            r = nlu_result[0]
-            module = r['module']
-            r_type = r['type']
+            module = nlu_result['module']
+            r_type = nlu_result['type']
             if r_type == 'Brand':
                 action = Action.choose
             else:
                 action = Action.inform
-            policy = Policy(action=action, data=r, module=module)
+            policy = Policy(action=action, data=nlu_result, module=module)
         else:
             policy = Policy()
+        return policy
+
+
+class SampleDP(BaseDP):
+    def predict(self, nlu_result, status: DMStatus) -> Policy:
+        policy = Policy(action=Action.guide)
         return policy

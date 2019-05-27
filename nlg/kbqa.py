@@ -28,14 +28,14 @@ class KBQAGenerator(BaseGenerator):
     def deal_choose(self, policy):
         datas = policy.data['data']
         relation = policy.data['relation']
-        texts = ['你是想问哪个呢？']
+        texts = ['你是想问哪个车系呢？']
         option = []
         for n, data in enumerate(datas[:5]):
             value = data.get('value')
             iri = data.get('iri')
             if value:
-                texts.append(str(n) + '.' + value)
-                option.append({'iri': iri, 'value': value})
+                texts.append(str(n + 1) + '.' + value)
+                option.append({'iri': iri, 'value': value, 'index': n + 1})
         text = '\n'.join(texts)
         result = NLGResult(text=text, action=policy.action, option=option)
         return result

@@ -1,5 +1,6 @@
 carbot_data_path=carbot_data
 rm -rf $carbot_data_path/
+
 cp -r data/dictionary $carbot_data_path
 cp -r data/kg $carbot_data_path
 
