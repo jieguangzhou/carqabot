@@ -6,7 +6,7 @@ import torch
 
 from pytorch_pretrained_bert import BertConfig, BertForSequenceClassification, BertTokenizer
 
-is_main = __name__ == '__main__'
+debug_message = False
 logger = getLogger('bert_tc')
 PROCESSOR_NAME = 'Processor.pkl'
 
@@ -26,8 +26,8 @@ class InputExample(object):
             specified for train and dev examples, but not for test examples.
         """
         self.guid = guid
-        self.text_a = text_a
-        self.text_b = text_b
+        self.text_a = str(text_a)
+        self.text_b = str(text_b) if text_b is not None else None
         self.label = label
 
 
@@ -83,7 +83,7 @@ class PredicateClassificationProcessor:
 
         features = []
         for (ex_index, example) in enumerate(examples):
-            if ex_index % 10000 == 0 and is_main:
+            if ex_index % 10000 == 0 and debug_message:
                 logger.info("Writing example %d of %d" % (ex_index, len(examples)))
 
             tokens_a = tokenizer.tokenize(example.text_a)
@@ -143,7 +143,7 @@ class PredicateClassificationProcessor:
 
             label_id = label_map.get(example.label)
 
-            if ex_index < 5 and is_main:
+            if ex_index < 5 and debug_message:
                 logger.info("*** Example ***")
                 logger.info("guid: %s" % (example.guid))
                 logger.info("tokens: %s" % " ".join(
@@ -209,7 +209,6 @@ class Predictor:
         label = self.id2label.get(label_id)
         return label, confidence
 
-
-    def predict_text(self, text):
-        example = InputExample(guid=None, text_a=text)
+    def predict_text(self, text_a, text_b=None):
+        example = InputExample(guid=None, text_a=text_a, text_b=text_b)
         return self.predict(example)

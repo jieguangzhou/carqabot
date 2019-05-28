@@ -9,7 +9,7 @@ class RelationClassifier:
         self.predictor = Predictor(Path.relation_classifier_model)
 
     def predict(self, text):
-        label, confidence = self.predictor.predict_text(text)
+        label, confidence = self.predictor.predict_text(text_a=text)
         logger.debug('{} {} {}'.format(label, confidence, confidence >= 0.6))
         if confidence < 0.6:
             label = ''

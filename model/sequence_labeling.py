@@ -6,7 +6,7 @@ import torch
 
 from pytorch_pretrained_bert import BertForTokenClassification, BertTokenizer
 
-is_main = __name__ == '__main__'
+debug_message = False
 logger = getLogger('bert_tc')
 PROCESSOR_NAME = 'Processor.pkl'
 
@@ -78,7 +78,7 @@ class NerProcessor:
 
         features = []
         for (ex_index, example) in enumerate(examples):
-            if ex_index % 10000 == 0 and is_main:
+            if ex_index % 10000 == 0 and debug_message:
                 logger.info("Writing example %d of %d" % (ex_index, len(examples)))
 
 
@@ -135,7 +135,7 @@ class NerProcessor:
 
             label_ids = [label_map.get(tag) for tag in label_ids]
 
-            if ex_index < 5 and is_main:
+            if ex_index < 5 and debug_message:
                 logger.info("*** Example ***")
                 logger.info("guid: %s" % (example.guid))
                 logger.info("tokens: %s" % " ".join(
