@@ -30,6 +30,9 @@ class InputExample(object):
         self.text_b = str(text_b) if text_b is not None else None
         self.label = label
 
+    def __str__(self):
+        return str(self.__dict__)
+
 
 class InputFeatures(object):
     """A single set of features of data."""
@@ -195,11 +198,11 @@ class Predictor:
         self.classifier.eval()
         self.id2label = {i: label for i, label in enumerate(self.processor.labels)}
 
-    def predict(self, InputExample):
-        features = self.processor.convert_examples_to_features([InputExample], self.max_seq_length, self.tokenizer)
+    def predict(self, input_example):
+        features = self.processor.convert_examples_to_features([input_example], self.max_seq_length, self.tokenizer)
         input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
-        segment_ids = torch.tensor([f.input_mask for f in features], dtype=torch.long)
-        input_mask = torch.tensor([f.segment_ids for f in features], dtype=torch.long)
+        input_mask = torch.tensor([f.input_mask for f in features], dtype=torch.long)
+        segment_ids = torch.tensor([f.segment_ids for f in features], dtype=torch.long)
 
         with torch.no_grad():
             logits = self.classifier(input_ids, segment_ids, input_mask, labels=None)

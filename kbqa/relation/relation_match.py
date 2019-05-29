@@ -16,8 +16,7 @@ class RelationMatch:
         results = []
         for predicate in self.predicates:
             label, confidence = self.predictor.predict_text(text_a=text, text_b=predicate)
-            logger.info('{} {} {}'.format(predicate, label, confidence))
-            if label == 0:
+            if label == 'No':
                 confidence = 1 - confidence
             results.append((predicate, confidence))
         top_5_result = sorted(results, key=lambda x:x[1], reverse=True)[:5]
