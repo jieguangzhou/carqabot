@@ -14,14 +14,19 @@ class RelationMatch:
 
     def predict(self, text):
         results = []
-        for predicate in self.predicates:
-            label, confidence = self.predictor.predict_text(text_a=text, text_b=predicate)
+        result = self.predictor.predict_texts(text_a_s=text, text_b_s=self.predicates)
+        for predicate, (label, confidence) in zip(self.predicates, result):
             if label == 'No':
                 confidence = 1 - confidence
             results.append((predicate, confidence))
-        top_5_result = sorted(results, key=lambda x:x[1], reverse=True)[:5]
+        top_5_result = sorted(results, key=lambda x: x[1], reverse=True)[:5]
         for label, confidence in top_5_result:
-            logger.debug('{} {} {}'.format(label, confidence, confidence >= 0.6))
+            logger.debug('{} {}'.format(label, confidence))
+
+        top_label, top_confidence = top_5_result[0]
+        if top_confidence < 0.97:
+            top_label = ''
+        return top_label, top_confidence
 
     def load_predictes(self):
         predicates = []
@@ -34,5 +39,4 @@ class RelationMatch:
                 iri, *words = line.split('\t')
                 for word in words:
                     predicates.append(word)
-                    print(word)
         return predicates

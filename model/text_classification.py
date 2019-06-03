@@ -190,28 +190,61 @@ class PredicateClassificationProcessor:
 
 
 class Predictor:
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
     def __init__(self, dir_path, max_seq_length=30):
         self.max_seq_length = max_seq_length
         self.processor = PredicateClassificationProcessor.load(os.path.join(dir_path, PROCESSOR_NAME))
         self.tokenizer = BertTokenizer.from_pretrained(dir_path)
-        self.classifier = BertForSequenceClassification.from_pretrained(dir_path, len(self.processor.labels))
+        self.classifier = BertForSequenceClassification.from_pretrained(dir_path,
+                                                                        len(self.processor.labels)).to(self.device)
         self.classifier.eval()
         self.id2label = {i: label for i, label in enumerate(self.processor.labels)}
 
-    def predict(self, input_example):
-        features = self.processor.convert_examples_to_features([input_example], self.max_seq_length, self.tokenizer)
-        input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
-        input_mask = torch.tensor([f.input_mask for f in features], dtype=torch.long)
-        segment_ids = torch.tensor([f.segment_ids for f in features], dtype=torch.long)
-
+    def predict(self, input_examples):
+        features = self.processor.convert_examples_to_features(input_examples, self.max_seq_length, self.tokenizer)
+        input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long).to(self.device)
+        input_mask = torch.tensor([f.input_mask for f in features], dtype=torch.long).to(self.device)
+        segment_ids = torch.tensor([f.segment_ids for f in features], dtype=torch.long).to(self.device)
         with torch.no_grad():
             logits = self.classifier(input_ids, segment_ids, input_mask, labels=None)
-            preds = torch.softmax(logits, dim=1).detach().cpu().numpy()[0]
+            preds = torch.softmax(logits, dim=1).detach().cpu().numpy()
+        return preds
+
+    def predict_text(self, text_a, text_b=None):
+        example = InputExample(guid=None, text_a=text_a, text_b=text_b)
+        preds = self.predict([example])[0]
         label_id = np.argmax(preds)
         confidence = preds[label_id]
         label = self.id2label.get(label_id)
         return label, confidence
 
-    def predict_text(self, text_a, text_b=None):
-        example = InputExample(guid=None, text_a=text_a, text_b=text_b)
-        return self.predict(example)
+    def predict_texts(self, text_a_s, text_b_s=None, batch_size=None):
+        batch_size = batch_size or 2
+        if not isinstance(text_b_s, list):
+            text_b_s = [text_b_s] * len(text_a_s)
+        if not isinstance(text_a_s, list):
+            text_a_s = [text_a_s] * len(text_b_s)
+
+        if len(text_a_s) != len(text_b_s):
+            raise Exception(
+                'text_a_s size must be same as text_b_s, but get {} and {}'.format(len(text_a_s), len(text_b_s)))
+        result = []
+        examples = []
+        for text_a, text_b in zip(text_a_s, text_b_s):
+            example = InputExample(guid=None, text_a=text_a, text_b=text_b)
+            examples.append(example)
+            if len(examples) >= batch_size:
+                for preds in self.predict(examples):
+                    label_id = np.argmax(preds)
+                    confidence = preds[label_id]
+                    label = self.id2label.get(label_id)
+                    result.append((label, confidence))
+                examples = []
+        if examples:
+            for preds in self.predict(examples):
+                label_id = np.argmax(preds)
+                confidence = preds[label_id]
+                label = self.id2label.get(label_id)
+                result.append((label, confidence))
+        return result

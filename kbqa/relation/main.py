@@ -13,7 +13,8 @@ class Relation:
         self.relation_mapping = RelationMapping()
 
     def predict(self, text):
-        self.relation_match.predict(text)
         relation, confidence = self.relation_classifier.predict(text)
+        if not relation:
+            relation, confidence = self.relation_match.predict(text)
         iri_relation = self.relation_mapping(relation)
         return iri_relation, confidence
