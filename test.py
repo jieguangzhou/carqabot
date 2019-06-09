@@ -39,4 +39,9 @@ def test_matcher():
     print(matcher.match('奔驰E级 的座位数'))
 
 
+def test_complex_qa():
+    from kbqa.common.dictionary_match import Matcher
+    matcher = Matcher()
+    print(matcher.match('奔驰E级 的座位数'))
+
 chat()

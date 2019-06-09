@@ -33,7 +33,6 @@ python bert_script/run_sequence_labeling.py \
   --num_train_epochs 10 \
   --output_dir $carbot_data_path/model/ner/
 
-'
 python bert_script/run_text_similarity.py \
   --text_a_key question \
   --text_b_key predicate \
@@ -49,3 +48,26 @@ python bert_script/run_text_similarity.py \
   --learning_rate 2e-5 \
   --num_train_epochs 1 \
   --output_dir $carbot_data_path/model/kbqapm/
+
+'
+python script/get_relation_match_data.py \
+  --sample_qa_path data/train/kbqa/predicate_classification/train.xlsx \
+  --complex_qa_path data/train/kbqa/complex_qa/complex_qa.xlsx \
+  --save_path data/train/kbqa/complex_qa \
+
+
+python bert_script/run_text_similarity.py \
+  --text_a_key text_a \
+  --text_b_key text_b \
+  --label_key label \
+  --cache_dir ./data/bert_pretrain \
+  --do_train \
+  --do_eval \
+  --do_lower_case \
+  --data_dir data/train/kbqa/complex_qa \
+  --bert_model bert-base-chinese \
+  --max_seq_length 30 \
+  --train_batch_size 64 \
+  --learning_rate 2e-5 \
+  --num_train_epochs 1 \
+  --output_dir $carbot_data_path/model/kbqasp/

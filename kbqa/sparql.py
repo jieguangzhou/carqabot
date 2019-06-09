@@ -125,24 +125,28 @@ class KG2:
                 })
         return results
 
-    def get_object(self, subject, predicate):
-        query = """
-            SELECT ?object ?style
-            WHERE {
-              <%(subject)s> <%(predicate)s> ?object;
-              p:style ?style.
-            }
-            """ % {'subject': subject, 'predicate': predicate}
+    def get_object(self, subjects, predicate):
         objects = []
-        for result in self.query(query):
-            value = result["object"]["value"]
-            name = result["style"]["value"]
-            if check_value(value):
-                objects.append({
-                    'value': value,
-                    'name': name,
-                })
+        if isinstance(subjects, str):
+            subjects = [subjects]
+        for subject in subjects:
+            query = """
+                SELECT ?object ?style
+                WHERE {
+                  <%(subject)s> <%(predicate)s> ?object;
+                  p:style ?style.
+                }
+                """ % {'subject': subject, 'predicate': predicate}
+            for result in self.query(query):
+                value = result["object"]["value"]
+                name = result["style"]["value"]
+                if check_value(value):
+                    objects.append({
+                        'value': value,
+                        'name': name,
+                    })
         return objects
+
 
     def query(self, query):
         query = PREFIX + query

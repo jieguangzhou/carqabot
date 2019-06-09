@@ -12,14 +12,18 @@ class NoEntityQA(BaseQA):
     def predict(self, relation, status: DMStatus = None):
         result = None
         iri = status.kb_status.last_entity
+        logger.debug(iri)
         if not iri:
             return result
-        if 'train' in iri:
-            iri_class = 'Train'
-        elif 'car' in iri:
+        if isinstance(iri, list):
             iri_class = 'Car'
         else:
-            iri_class = 'Brand'
+            if 'train' in iri:
+                iri_class = 'Train'
+            elif 'car' in iri:
+                iri_class = 'Car'
+            else:
+                iri_class = 'Brand'
 
         if iri_class == 'Train':
             result_data = self.search_train_object(iri, relation)

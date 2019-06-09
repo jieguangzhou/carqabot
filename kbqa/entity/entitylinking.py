@@ -26,10 +26,10 @@ class EntityLinking:
             iris_train = self.match_word(word, self.dictionary_train)
             iris_car = self.match_word(word, self.dictionary_car)
             iris = iris_brand | iris_train | iris_car
+            logger.debug(iris)
             start = entity['start']
             end = entity['end']
-            # replace_text = text[:start] + ' ' + text[end + 1:]
-            replace_text_words = set([i for i in jieba.lcut(text, HMM=False) if i.strip()])
+            replace_text_words = set([i for i in jieba.lcut(text.lower(), HMM=False) if i.strip()])
             entity_lingkings_scores = []
             for iri in iris:
                 feature_data = self.iri_features[iri]
@@ -46,17 +46,6 @@ class EntityLinking:
                                              reverse=True)[:3]
             logger.debug(entity_lingkings_scores)
             entity['entity_linking'] = entity_lingkings_scores
-
-    def get_style_data(self, path):
-        style_data = {}
-        with open(path, 'r') as r_f:
-            for line in r_f:
-                line = line.rstrip('\n')
-                if not line:
-                    continue
-                iri, *_, style = line.split('\t')
-                style_data[iri] = jieba.lcut(style.lower()), style
-        return style_data
 
     def match_word(self, word, dictionary: Dictionary):
         iri_cars = dictionary.match(word)

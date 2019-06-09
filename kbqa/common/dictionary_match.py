@@ -3,17 +3,17 @@ import os
 from config import Path
 import re
 from collections import defaultdict
-import jieba
+from kbqa.common.tokenizer import Tokenizer
 
 
 class Matcher:
     def __init__(self):
         self.automaton = self.__create_automaton()
         self.mapping = defaultdict(set)
-        self.__init()
+        self.tokenizer = self._init_tokenizer()
 
     def match(self, text):
-        words = jieba.lcut(text.lower())
+        words = self.tokenizer.lcut(text.lower())
         index = 0
         result = []
         for word in words:
@@ -33,7 +33,8 @@ class Matcher:
         return result
         # for word in words:
 
-    def __init(self):
+    def _init_tokenizer(self):
+        tokenizer = Tokenizer()
         paths = [
             ('Brand', os.path.join(Path.dictionary, 'Brand.txt')),
             ('Car', os.path.join(Path.dictionary, 'Car.txt')),
@@ -47,8 +48,9 @@ class Matcher:
                     _, *words = line.split('\t')
                     for word in words:
                         word = re.sub('\(.*?\)', '', word.lower())
-                        jieba.suggest_freq(word, tune=True)
+                        tokenizer.suggest_freq(word, tune=True)
                         self.mapping[word].add(tag)
+        return tokenizer
 
     def __create_automaton(self):
         paths = [
