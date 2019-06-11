@@ -69,7 +69,7 @@ class EntityLinking:
                 fuzzy_iri_cars = dictionary.match(match['word'])
                 iri_cars.update(fuzzy_iri_cars)
                 words.append(match['word'])
-            logger.warning('fuzzy match {}'.format(words))
+            logger.debug('fuzzy match {}'.format(words))
         return iri_cars
 
     def get_iri_features(self, dictionary_dir):

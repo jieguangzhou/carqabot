@@ -1,5 +1,4 @@
 carbot_data_path=carbot_data
-: '
 rm -rf $carbot_data_path/
 
 cp -r data/dictionary $carbot_data_path
@@ -49,7 +48,6 @@ python bert_script/run_text_similarity.py \
   --num_train_epochs 1 \
   --output_dir $carbot_data_path/model/kbqapm/
 
-'
 python script/get_relation_match_data.py \
   --sample_qa_path data/train/kbqa/predicate_classification/train.xlsx \
   --complex_qa_path data/train/kbqa/complex_qa/complex_qa.xlsx \
