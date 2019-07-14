@@ -150,7 +150,7 @@ class KG2:
 
     def query(self, query):
         query = PREFIX + query
-        # logger.debug(query)
+        logger.debug(query)
         self.sparql.setQuery(query)
         self.sparql.setReturnFormat(JSON)
         results = self.sparql.query().convert()["results"]["bindings"]
