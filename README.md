@@ -56,7 +56,7 @@
    python3.5 chat.py
    ```
 
-   ![1560263377688](/home/guang/.config/Typora/typora-user-images/1560263377688.png)
+   ![1560263377688](images/1560263377688.png)
 
 2. api形式
 

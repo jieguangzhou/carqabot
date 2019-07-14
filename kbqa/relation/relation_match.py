@@ -8,6 +8,9 @@ logger = getLogger('RelationMatch')
 
 
 class RelationMatch:
+    """
+    关系匹配，使用bert文本相似度方法进行
+    """
     def __init__(self):
         self.predicates = self.load_predictes()
         self.predictor = Predictor(Path.relation_match_model)

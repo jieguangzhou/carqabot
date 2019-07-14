@@ -6,6 +6,19 @@ logger = getLogger('HistoryEntityQA')
 
 
 class HistoryEntityQA(BaseQA):
+    """
+    解决做选择时实体更换之后，回答历史关系的模块
+    如上次问了  奔驰多少钱
+    然后机器人回答了
+        你是想问哪个车系的厂商指导价呢？
+        1.奔驰E级AMG
+        2.凌特
+        3.奔驰G级
+        4.奔驰C级(进口)
+        5.奔驰CLS级
+    然后回答 E级
+    那么就会通过选择模块进行匹配得到 奔驰E级AMG，然后进行回答
+    """
     def __init__(self):
         super(HistoryEntityQA, self).__init__()
 

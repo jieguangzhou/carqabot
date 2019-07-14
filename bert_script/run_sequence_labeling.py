@@ -402,9 +402,11 @@ def main():
                     preds[0], logits.detach().cpu().numpy(), axis=0)
 
         eval_loss = eval_loss / nb_eval_steps
-        preds = preds[0][1:-1]
-        preds = np.argmax(preds, axis=1)
-        result = compute_metrics(preds, all_label_ids.numpy())
+        preds = preds[0]
+        preds = np.argmax(preds, axis=2)
+        print(preds.shape)
+        print(all_label_ids.numpy().shape)
+        result = compute_metrics(preds.flatten(), all_label_ids.numpy().flatten())
         loss = tr_loss / global_step if args.do_train else None
 
         result['eval_loss'] = eval_loss

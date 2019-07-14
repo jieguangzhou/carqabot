@@ -7,6 +7,9 @@ from kbqa.relation.relation_match import RelationMatch
 logger = getLogger('relation')
 
 class Relation:
+    """
+    关系识别模块，主要有关系分类，关系匹配以及关将关系映射到iri
+    """
     def __init__(self):
         self.relation_classifier = RelationClassifier()
         self.relation_match = RelationMatch()

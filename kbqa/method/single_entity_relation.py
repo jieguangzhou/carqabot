@@ -7,6 +7,10 @@ logger = getLogger('SingleEntityQA')
 
 
 class SingleEntityQA(BaseQA):
+    """
+    回答普通KBQA，不使用上文
+    如直接问 奥迪R8的最高车速是多少公里
+    """
     def __init__(self):
         super(SingleEntityQA, self).__init__()
 

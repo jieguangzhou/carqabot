@@ -1,9 +1,13 @@
 carbot_data_path=carbot_data
-rm -rf $carbot_data_path/
 
-cp -r data/dictionary $carbot_data_path
+rm -rf $carbot_data_path
+echo $carbot_data_path
+
 cp -r data/kg $carbot_data_path
-cp -r carbot_data/sample_question $carbot_data_path
+cp -r data/kg $carbot_data_path
+cp -r data/sample_question $carbot_data_path
+cp -r data/dictionary $carbot_data_path
+cp -r data/complex_qa.xlsx $carbot_data_path
 
 
 python bert_script/run_text_classifier.py \
@@ -29,7 +33,7 @@ python bert_script/run_sequence_labeling.py \
   --max_seq_length 30 \
   --train_batch_size 32 \
   --learning_rate 2e-5 \
-  --num_train_epochs 10 \
+  --num_train_epochs 1 \
   --output_dir $carbot_data_path/model/ner/
 
 python bert_script/run_text_similarity.py \
@@ -50,7 +54,7 @@ python bert_script/run_text_similarity.py \
 
 python script/get_relation_match_data.py \
   --sample_qa_path data/train/kbqa/predicate_classification/train.xlsx \
-  --complex_qa_path data/train/kbqa/complex_qa/complex_qa.xlsx \
+  --complex_qa_path data/complex_qa.xlsx \
   --save_path data/train/kbqa/complex_qa \
 
 

@@ -7,6 +7,7 @@ from kbqa.common.tokenizer import Tokenizer
 
 
 class Matcher:
+    """字典匹配"""
     def __init__(self):
         self.automaton = self.__create_automaton()
         self.mapping = defaultdict(set)

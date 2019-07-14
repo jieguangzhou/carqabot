@@ -9,6 +9,9 @@ logger = getLogger('EntityLinking')
 
 
 class EntityLinking:
+    """
+    实体链接模块，使用字典映射以及模糊匹配
+    """
     def __init__(self):
         dictionary_dir = Path.dictionary
         self.dictionary_brand = Dictionary(os.path.join(dictionary_dir, 'Brand.txt'))
@@ -62,7 +65,6 @@ class EntityLinking:
                 matchs.append(match)
 
             matchs = [iri_score for iri_score in matchs if iri_score['score'] == max_score]
-            logger.warning(matchs)
             iri_cars = set()
             words = []
             for match in matchs:

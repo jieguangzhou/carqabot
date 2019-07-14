@@ -6,7 +6,7 @@ import torch
 
 from pytorch_pretrained_bert import BertForTokenClassification, BertTokenizer
 
-debug_message = False
+debug_message = True
 logger = getLogger('bert_tc')
 PROCESSOR_NAME = 'Processor.pkl'
 
@@ -170,6 +170,9 @@ class Predictor:
         self.classifier = BertForTokenClassification.from_pretrained(dir_path, len(self.processor.labels))
         self.classifier.eval()
         self.id2label = {i: label for i, label in enumerate(self.processor.labels)}
+
+        global debug_message
+        debug_message = False
 
     def predict(self, InputExample):
         max_seq_length = len(InputExample.text) + 2

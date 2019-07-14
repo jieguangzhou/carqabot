@@ -5,6 +5,9 @@ logger = getLogger('RelationClassifier')
 
 
 class RelationClassifier:
+    """
+    关系分类，使用bert进行文本分类
+    """
     def __init__(self):
         self.predictor = Predictor(Path.relation_classifier_model)
 

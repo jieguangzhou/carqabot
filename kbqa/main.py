@@ -17,7 +17,6 @@ class KBQA:
     def __init__(self):
         self.entity = Entity()
         self.relation = Relation()
-        self.matcher = Matcher()
         self.qa_single_entity = SingleEntityQA()
         self.qa_history_entity = HistoryEntityQA()
         self.qa_no_entity = NoEntityQA()
@@ -26,9 +25,10 @@ class KBQA:
 
     def predict(self, text, status: DMStatus = None, other_entity_iri=None):
         logger.debug('{} {}'.format('other_entity_iri', other_entity_iri))
-        match_result = self.matcher.match(text)
-        entitys = self.entity.predict(text, match_result)
+
+        entitys = self.entity.predict(text)
         top_qa_type, top_confidence = self.complex_match.predict(text)
+        # 如果匹配到特殊复杂QA，则运行复杂QA，否则运行简单QA
         if top_qa_type:
             result = self.run_complex_qa(top_qa_type, text, entitys, status)
         else:

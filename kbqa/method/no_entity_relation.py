@@ -6,6 +6,11 @@ logger = getLogger('NoEntityQA')
 
 
 class NoEntityQA(BaseQA):
+    """
+    解决关系更换之后，回答历史实体的模块
+    如上次问了  宝马5系多少钱
+    然后机器人回答了之后又接着问 百米加速是多少呢
+    """
     def __init__(self):
         super(NoEntityQA, self).__init__()
 

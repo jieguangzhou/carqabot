@@ -7,6 +7,10 @@ logger = getLogger('ComplexQA')
 
 
 class ComplexQA(BaseQA):
+    """
+    复杂QA,用于定义特定问答的QA问题，如
+     宝马20W以下有哪些车
+    """
     def __init__(self):
         super(ComplexQA, self).__init__()
         self.name = self.__class__.__name__
