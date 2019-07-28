@@ -131,15 +131,15 @@ class KG2:
             subjects = [subjects]
         for subject in subjects:
             query = """
-                SELECT ?object ?style
+                SELECT ?object ?name
                 WHERE {
                   <%(subject)s> <%(predicate)s> ?object;
-                  p:style ?style.
+                  rdfs:label ?name.
                 }
                 """ % {'subject': subject, 'predicate': predicate}
             for result in self.query(query):
                 value = result["object"]["value"]
-                name = result["style"]["value"]
+                name = result["name"]["value"]
                 if check_value(value):
                     objects.append({
                         'value': value,

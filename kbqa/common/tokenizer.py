@@ -1,4 +1,8 @@
 from jieba import Tokenizer as BaseTokenizer, string_types, strdecode
+import re
+
+RE_NUM_POINT = re.compile('[\.\da-zA-Z\-]+')
+
 
 
 class Tokenizer(BaseTokenizer):
@@ -32,3 +36,21 @@ class Tokenizer(BaseTokenizer):
         if tune:
             self.add_word(word, freq)
         return freq
+
+
+    def lcut(self, sentence):
+        special_words = RE_NUM_POINT.findall(sentence)
+        delete_words = []
+        for word in special_words:
+            if word not in self.FREQ:
+                self.suggest_freq(word, tune=True)
+                delete_words.append(word)
+
+        result = super(Tokenizer, self).lcut(sentence, HMM=False)
+        return result
+
+
+
+if __name__ == '__main__':
+    tonkizer = Tokenizer()
+    print(tonkizer.lcut('拓陆者 2018款 2.4L E3汽油两驱精英型国V 4G69S4M'))

@@ -15,6 +15,7 @@ class SingleEntityQA(BaseQA):
         super(SingleEntityQA, self).__init__()
 
     def predict(self, entities, relation, status: DMStatus = None):
+        entities = [entity for entity in entities if entity['entity_linking']]
         if len(entities) != 1:
             return None
 
