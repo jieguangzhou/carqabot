@@ -6,6 +6,10 @@
 
 ​	该技术路线主要将KBQA分为三部分，实体识别与实体链接，关系识别，sparql查询，其中每个部分分为一到多种方法实现。
 
+​	具体的处理流程图如下：
+
+![kbqa](../images/kbqa.jpg)
+
 ​	当用户输入一个句子之后，问答系统会从用户的句子中抽取对应的实体提及，然后根据抽取的实体提及通过实体链接映射到知识图谱中的实体。同时，系统也会从句子中识别到用户想要问的关系，然后结合实体和关系，即可使用sparql语言从知识图谱中查询得到对应的结果。
 
 ​	样例如下：
@@ -50,7 +54,7 @@ WHERE {
 奥迪R8 2017款 V10 Spyder 的最高车速是 318km/h
 ```
 
-​	下面介绍各个模块的详细技术实现。每个模块的介绍主要从三个方面开展，数据准备，模型介绍/实现方法，效果评估
+​	下面介绍各个模块的详细技术实现。每个模块的介绍主要从三个方面开展，数据准备，模型介绍/实现方法，效果评估。
 
 ## 2 实体识别与实体链接
 
@@ -753,9 +757,9 @@ def jaccard(set1: set, set2: set):
 
 ​	sparql查询为一种基于RDF数据的查询语言。在本问答系统中，主要针对对应的subject与predicate进行不同的查询。在梳理完应用场景之后，归纳出以下集中主要查询方式。
 
-### 4.1 汽车匹配关系查询
+### 4.1 汽车品牌关系查询
 
-​	当问及汽车匹配的关系的时候，将查到该品牌下的所有车系，用于反问用户想问的是哪个车系，如问**"宝马多少钱"**，那么可以通过第二章和第三章的技术识别到
+​	当问及汽车品牌的关系的时候，将查到该品牌下的所有车系，用于反问用户想问的是哪个车系，如问**"宝马多少钱"**，那么可以通过第二章和第三章的技术识别到
 
 ```
 实体为：
@@ -808,3 +812,147 @@ WHERE {
 | "http://www.demo.com/kg/item/train#s3053" | "宝马X4"        |
 | "http://www.demo.com/kg/item/train#s2728" | "宝马X5 M"      |
 | "http://www.demo.com/kg/item/train#s3189" | "宝马M4"        |
+
+### 4.2 汽车车系关系查询
+
+​	当问及汽车车系的关系的时候，将查询该车系下的所有车型的车关于该关系的数据，并且按上市时间进行排序，如问**"奥迪A8多少钱"**，那么可以通过第二章和第三章的技术识别到
+
+```
+实体为：
+<http://www.demo.com/kg/item/train#s146> 奥迪A8
+关系为：
+<http://www.demo.com/predicate/厂商指导价(元)>
+
+因此进行该车系下所有车型的厂商指导价，查询语句为：
+
+PREFIX p:<http://www.demo.com/predicate/>
+PREFIX item:<http://www.demo.com/kg/item/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?car ?time ?object ?name
+WHERE {
+    ?car p:CarTrain <http://www.demo.com/kg/item/train#s146>;
+    p:上市时间 ?time;
+    <http://www.demo.com/predicate/厂商指导价(元)> ?object;
+    rdfs:label ?name.
+}order by DESC(?time)
+
+```
+
+得到结果如下：
+
+| "car"                                        | "time"    | "object"   | "name"                                            |
+| -------------------------------------------- | --------- | ---------- | ------------------------------------------------- |
+| "http://www.demo.com/kg/item/car#spec_38601" | "2019.04" | "868800"   | "奥迪A8 2019款 A8L 50 TFSI quattro 舒适型"        |
+| "http://www.demo.com/kg/item/car#spec_38602" | "2019.04" | "1007800"  | "奥迪A8 2019款 A8L 50 TFSI quattro 豪华型"        |
+| "http://www.demo.com/kg/item/car#spec_38603" | "2019.04" | "1073800"  | "奥迪A8 2019款 A8L 55 TFSI quattro 豪华型"        |
+| "http://www.demo.com/kg/item/car#spec_38604" | "2019.04" | "1220800"  | "奥迪A8 2019款 A8L 55 TFSI quattro 尊贵型"        |
+| "http://www.demo.com/kg/item/car#spec_33678" | "2018.04" | "1196800"  | "奥迪A8 2018款 A8L 55 TFSI quattro尊贵型"         |
+| "http://www.demo.com/kg/item/car#spec_33750" | "2018.04" | "1048800"  | "奥迪A8 2018款 A8L 55 TFSI quattro豪华型"         |
+| "http://www.demo.com/kg/item/car#spec_33896" | "2018.04" | "856800.0" | "奥迪A8 2018款 A8L 55 TFSI quattro投放版精英型"   |
+| "http://www.demo.com/kg/item/car#spec_33897" | "2018.04" | "917800"   | "奥迪A8 2018款 A8L 55 TFSI quattro投放版尊享型"   |
+| "http://www.demo.com/kg/item/car#spec_29089" | "2018.03" | "879800"   | "奥迪A8 2017款 A8L 40 TFSI 舒适型"                |
+| "http://www.demo.com/kg/item/car#spec_29094" | "2018.03" | "1188000"  | "奥迪A8 2017款 A8L 50 TFSI quattro豪华型"         |
+| "http://www.demo.com/kg/item/car#spec_29095" | "2018.03" | "1382000"  | "奥迪A8 2017款 A8L 50 TFSI quattro尊贵型"         |
+| "http://www.demo.com/kg/item/car#spec_29096" | "2018.03" | "1848000"  | "奥迪A8 2017款 A8L 60 TFSI quattro豪华型"         |
+| "http://www.demo.com/kg/item/car#spec_29097" | "2018.03" | "2568000"  | "奥迪A8 2017款 A8L 6.3 FSI W12 quattro旗舰型"     |
+| "http://www.demo.com/kg/item/car#spec_29945" | "2018.03" | "927800"   | "奥迪A8 2017款 A8L 45 TFSI quattro卓越先锋版"     |
+| "http://www.demo.com/kg/item/car#spec_29946" | "2018.03" | "1028800"  | "奥迪A8 2017款 A8L 45 TFSI quattro领先精英版"     |
+| "http://www.demo.com/kg/item/car#spec_32827" | "2018.03" | "927800"   | "奥迪A8 2017款 A8L 45 TFSI quattro卓越先锋典藏版" |
+| "http://www.demo.com/kg/item/car#spec_32828" | "2018.03" | "1028800"  | "奥迪A8 2017款 A8L 45 TFSI quattro领先精英典藏版" |
+| "http://www.demo.com/kg/item/car#spec_32829" | "2018.03" | "1188800"  | "奥迪A8 2017款 A8L 50 TFSI quattro都市尊荣典藏版" |
+| "http://www.demo.com/kg/item/car#spec_29092" | "2017.01" | "926800.0" | "奥迪A8 2017款 A8L 45 TFSI quattro舒适型"         |
+
+### 4.3 汽车车型关系查询
+
+​	当问及汽车车型的关系的时候，将查询该车型的关系数据，如问**"2017年款奥迪A8精英典藏版多少钱"**，那么可以通过第二章和第三章的技术识别到。
+
+```
+实体为：
+<http://www.demo.com/kg/item/car#spec_32828> 奥迪A8 2017款 A8L 45 TFSI quattro领先精英典藏版
+关系为：
+<http://www.demo.com/predicate/厂商指导价(元)>
+
+因此进行该车型的厂商指导价，查询语句为：
+
+PREFIX p:<http://www.demo.com/predicate/>
+PREFIX item:<http://www.demo.com/kg/item/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?object ?name
+WHERE {
+    <http://www.demo.com/kg/item/car#spec_32828> <http://www.demo.com/predicate/厂商指导价(元)> ?object;
+    rdfs:label ?name.
+}
+
+```
+
+得到结果如下：
+
+| "object"  | "name"                                            |
+| --------- | ------------------------------------------------- |
+| "1028800" | "奥迪A8 2017款 A8L 45 TFSI quattro领先精英典藏版" |
+
+### 4.4 复杂关系查询
+
+​	当涉及到复杂关系时，将按照定义好的逻辑进行sparql查询语言生成，如问到**"100W以下的保时捷有哪些"**
+
+匹配到复杂关系"**Price_ThenX**"，汽车实体**"保时捷"**。
+
+​	生成的sparql查询语言为：
+
+```
+PREFIX p:<http://www.demo.com/predicate/>
+PREFIX item:<http://www.demo.com/kg/item/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?car ?price ?car_name
+WHERE {
+    ?car <http://www.demo.com/predicate/厂商指导价(元)> ?price.
+    ?car rdfs:label ?car_name.
+    ?car p:BrandName <http://www.demo.com/kg/item/brand#40> .
+    FILTER (?price <= 1000000.0 && ?price > 0)
+}
+LIMIT 5
+```
+
+得到结果如下
+
+| "car"                                        | "price"  | "car_name"                     |
+| -------------------------------------------- | -------- | ------------------------------ |
+| "http://www.demo.com/kg/item/car#spec_34758" | "545000" | "保时捷718 2018款 Cayman 2.0T" |
+| "http://www.demo.com/kg/item/car#spec_35266" | "545000" | "Macan 2018款 Macan 2.0T"      |
+| "http://www.demo.com/kg/item/car#spec_24733" | "550000" | "Macan 2017款  Macan 2.0T"     |
+| "http://www.demo.com/kg/item/car#spec_19030" | "558000" | "Macan 2014款 Macan 2.0T"      |
+| "http://www.demo.com/kg/item/car#spec_22833" | "558000" | "Macan 2016款 Macan 2.0T"      |
+
+如问到**"宝马5系30万以上的有哪些"**，匹配到复杂关系"**Price_ThenX**"，汽车实体**"宝马5系"**。生成的sparql查询语言为：
+
+```
+PREFIX p:<http://www.demo.com/predicate/>
+PREFIX item:<http://www.demo.com/kg/item/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?car ?price ?car_name
+WHERE {
+    ?car <http://www.demo.com/predicate/厂商指导价(元)> ?price.
+    ?car rdfs:label ?car_name.
+    ?car p:CarTrain <http://www.demo.com/kg/item/train#s65> .
+    FILTER (?price <= 300000.0 && ?price > 0)
+}
+LIMIT 5
+```
+
+得到结果如下
+
+| "car"                                        | "price"  | "car_name"                      |
+| -------------------------------------------- | -------- | ------------------------------- |
+| "http://www.demo.com/kg/item/car#spec_5534"  | "412600" | "宝马5系 2009款 520Li 领先型"   |
+| "http://www.demo.com/kg/item/car#spec_5836"  | "412600" | "宝马5系 2010款 520Li 领先型"   |
+| "http://www.demo.com/kg/item/car#spec_9202"  | "418600" | "宝马5系 2011款 520Li 典雅型"   |
+| "http://www.demo.com/kg/item/car#spec_5837"  | "423600" | "宝马5系 2010款 520Li 豪华型"   |
+| "http://www.demo.com/kg/item/car#spec_35320" | "426900" | "宝马5系 2019款 525Li 豪华套装" |

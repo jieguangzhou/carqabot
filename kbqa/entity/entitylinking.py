@@ -38,6 +38,8 @@ class EntityLinking:
             for iri in iris:
                 feature_data = self.iri_features[iri]
                 score = self.jaccard(feature_data['feature'], replace_text_words)
+                if score <= 0.1:
+                    continue
                 entity_lingkings_scores.append({
                     'score': score,
                     'iri': iri,

@@ -11,6 +11,7 @@ class ComplexQA(BaseQA):
     复杂QA,用于定义特定问答的QA问题，如
      宝马20W以下有哪些车
     """
+
     def __init__(self):
         super(ComplexQA, self).__init__()
         self.name = self.__class__.__name__
@@ -39,6 +40,8 @@ class PriceLessThenX(ComplexQA):
 
             entity_data = entities[0].get('entity_linking', [{}])[0]
             results = self.get_price_object(price, price_type, entity_data)
+            if not results:
+                return {}
             entity = [i['car'] for i in results]
             if len(entity) == 1:
                 entity = entity[0]
@@ -47,7 +50,7 @@ class PriceLessThenX(ComplexQA):
                 'type': 'Car',
                 'data': results,
                 'entity': entity,
-                'relation': None
+                'relation': 'http://www.demo.com/predicate/厂商指导价(元)'
             }
         else:
             result = {}
@@ -71,6 +74,8 @@ class PriceLessThenX(ComplexQA):
                 entity_query = "?car p:BrandName <{}> .".format(entity_iri)
             elif entity_class == 'Train':
                 entity_query = "?car p:CarTrain <{}> .".format(entity_iri)
+            else:
+                return []
         logger.debug(entity_query)
         query = """
             SELECT ?car ?price ?car_name
@@ -83,7 +88,6 @@ class PriceLessThenX(ComplexQA):
             LIMIT 5
             """ % {'filter': filter, 'entity_query': entity_query}
         results = []
-        logger.debug(query)
         for result in self.kg.query(query):
             car = result["car"]["value"]
             price = result["price"]["value"]
