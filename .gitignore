@@ -109,3 +109,4 @@ data/bert_pretrain/*
 out/*
 /carbot_data/*
 /data/*
+.fuse_hidden*
