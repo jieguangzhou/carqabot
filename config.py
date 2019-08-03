@@ -10,5 +10,6 @@ class Path:
     ner_model = os.path.join(data_path, 'model', 'ner')
     relation_classifier_model = os.path.join(data_path, 'model', 'kbqapc')
     relation_match_model = os.path.join(data_path, 'model', 'kbqapm')
+    mrc_model = os.path.join(data_path, 'model', 'dbqa')
 
     sample_question = os.path.join(data_path, 'sample_question')

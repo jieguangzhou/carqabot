@@ -37,11 +37,14 @@ class PriceLessThenX(ComplexQA):
 
             if not entities:
                 entities = [{}]
-
-            entity_data = entities[0].get('entity_linking', [{}])[0]
+            print(entities)
+            entity_linkings = entities[0].get('entity_linking', [])
+            if not entity_linkings:
+                return None
+            entity_data = entity_linkings[0]
             results = self.get_price_object(price, price_type, entity_data)
             if not results:
-                return {}
+                return None
             entity = [i['car'] for i in results]
             if len(entity) == 1:
                 entity = entity[0]
@@ -53,7 +56,7 @@ class PriceLessThenX(ComplexQA):
                 'relation': 'http://www.demo.com/predicate/厂商指导价(元)'
             }
         else:
-            result = {}
+            result = None
         return result
 
     def get_price_object(self, price, price_type, entity_data=None):

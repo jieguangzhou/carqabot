@@ -32,6 +32,8 @@ class FirstDP(BaseDP):
     def predict(self, nlu_result, status: DMStatus) -> Policy:
         if nlu_result:
             module = nlu_result['module']
+            if module == 'dbqa':
+                return Policy(action=Action.inform, data=nlu_result, module=module)
             r_type = nlu_result['type']
             if r_type == 'Brand':
                 action = Action.choose

@@ -162,6 +162,8 @@ class NerProcessor:
         return pickle.load(open(path, 'rb'))
 
 
+
+
 class Predictor:
     def __init__(self, dir_path, max_seq_length=30):
         self.max_seq_length = max_seq_length
