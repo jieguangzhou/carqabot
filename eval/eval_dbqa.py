@@ -1,4 +1,11 @@
+import os
+import sys
+from collections import defaultdict
 import pandas as pd
+
+base_path = os.path.join(os.path.dirname(__file__), '..')
+sys.path.append(os.path.dirname(__file__))
+sys.path.append(base_path)
 from bleu_metric.bleu import Bleu
 from rouge_metric.rouge import Rouge
 
@@ -39,9 +46,10 @@ def normalize(s):
         normalized.append(' '.join(tokens))
     return normalized
 
+
 temp_datas = {}
-prediction_file = '/home/guang/bigdata/project/carqabot/carbot_data/model/dbqa/predictions.json'
-test_data_path = '/home/guang/bigdata/project/carqabot/data/train/dbqa/test.json'
+prediction_file = os.path.join(base_path, 'carbot_data/model/dbqa/predictions.json')
+test_data_path = os.path.join(base_path, 'data/train/dbqa/test.json')
 
 pred_answers = json.load(open(prediction_file, 'r'))
 ref_answers = {}
@@ -53,10 +61,10 @@ for data in test_data:
     answer = d['answers'][0]['text']
     ref_answers[id_] = answer
     temp_datas[id_] = {
-        'id':int(id_),
-        'answer':answer,
-        'doc':context,
-        'question':d['question']
+        'id': int(id_),
+        'answer': answer,
+        'doc': context,
+        'question': d['question']
     }
 
 pred_dict = {}
@@ -70,16 +78,13 @@ for key in pred_answers.keys():
         temp_data['pred'] = pred_answers[key]
         datas.append(temp_data)
 
-for key in pred_answers.keys():
-    print(pred_dict[key], ref_dict[key])
 result = compute_bleu_rouge(pred_dict, ref_dict)
-print(result)
-result = [{'metrics':name, 'value':round(100*score, 2)} for name, score in result.items()]
+result = [{'metrics': name, 'value': round(100 * score, 2)} for name, score in result.items()]
 
 df = pd.DataFrame(datas, columns=['id', 'doc', 'question', 'answer', 'pred'])
 df_metrics = pd.DataFrame(result, columns=['metrics', 'value']).sort_values('metrics')
 
-writer = pd.ExcelWriter('../report/dbqa.xlsx')
+writer = pd.ExcelWriter(os.path.join(base_path, 'report/dbqa.xlsx'))
 df.to_excel(writer, sheet_name='result', index=False)
 df_metrics.to_excel(writer, sheet_name='metrics', index=False)
 writer.close()

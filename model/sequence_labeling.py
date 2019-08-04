@@ -81,7 +81,6 @@ class NerProcessor:
             if ex_index % 10000 == 0 and debug_message:
                 logger.info("Writing example %d of %d" % (ex_index, len(examples)))
 
-
             tokens = []
             for char in example.text:
                 token = tokenizer.tokenize(char)
@@ -153,15 +152,12 @@ class NerProcessor:
                               label_ids=label_ids))
         return features
 
-
     def save(self, path):
         pickle.dump(self, open(path, 'wb'))
 
     @classmethod
     def load(cls, path):
         return pickle.load(open(path, 'rb'))
-
-
 
 
 class Predictor:
@@ -187,25 +183,41 @@ class Predictor:
             preds = torch.softmax(logits[0], dim=1).detach().cpu().numpy()[1:-1]
         label_ids = np.argmax(preds, axis=1)
         tags = [self.id2label[label_id] for label_id in label_ids]
-        confidences = [pred[label_id]  for pred, label_id in zip(preds, label_ids)]
+        confidences = [pred[label_id] for pred, label_id in zip(preds, label_ids)]
         return tags, confidences
-
 
     def predict_text(self, text):
         example = InputExample(guid=None, text=text)
         tags, confidences = self.predict(example)
+        entities = self.concat_entity(text, tags, confidences)
+
+        return entities
+
+    @staticmethod
+    def concat_entity(text, tags, confidences=None):
         entities = []
         entity_indexs = []
-        for index, (tag, pro) in enumerate(zip(tags, confidences)):
+        for index, tag in enumerate(tags):
             if tag == 'E' or tag == 'S':
                 entity_indexs.append(index)
                 if entity_indexs:
                     start, end = entity_indexs[0], entity_indexs[-1]
-                    pros = confidences[start:end+1]
-                    entities.append({'start':start,
-                                     'end':end,
-                                     'word':text[start:end+1],
-                                     'confidence':round(sum(pros) / len(pros), 2)
+
+                    word = text[start:end + 1]
+                    if word.endswith(' ') and end- start >= 1:
+                        end -= 1
+                        word = word[:-1]
+
+                    if confidences is not None:
+                        pros = confidences[start:end + 1]
+                        confidence = round(sum(pros) / len(pros), 2)
+                    else:
+                        confidence = 1.0
+
+                    entities.append({'start': start,
+                                     'end': end,
+                                     'word': word,
+                                     'confidence': confidence
                                      })
                 entity_indexs = []
             elif tag == 'I':

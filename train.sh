@@ -20,7 +20,7 @@ python bert_script/run_text_classifier.py \
   --max_seq_length 30 \
   --train_batch_size 32 \
   --learning_rate 2e-5 \
-  --num_train_epochs 3 \
+  --num_train_epochs 5 \
   --output_dir $carbot_data_path/model/kbqapc/
 
 python bert_script/run_sequence_labeling.py \
@@ -33,7 +33,7 @@ python bert_script/run_sequence_labeling.py \
   --max_seq_length 30 \
   --train_batch_size 32 \
   --learning_rate 2e-5 \
-  --num_train_epochs 1 \
+  --num_train_epochs 5 \
   --output_dir $carbot_data_path/model/ner/
 
 python bert_script/run_text_similarity.py \
@@ -49,7 +49,7 @@ python bert_script/run_text_similarity.py \
   --max_seq_length 30 \
   --train_batch_size 64 \
   --learning_rate 2e-5 \
-  --num_train_epochs 1 \
+  --num_train_epochs 5 \
   --output_dir $carbot_data_path/model/kbqapm/
 
 python script/get_relation_match_data.py \
@@ -71,11 +71,11 @@ python bert_script/run_text_similarity.py \
   --max_seq_length 30 \
   --train_batch_size 64 \
   --learning_rate 2e-5 \
-  --num_train_epochs 1 \
+  --num_train_epochs 5 \
   --output_dir $carbot_data_path/model/kbqasp/
 
 
-: '
+
 python bert_script/run_squad.py \
   --bert_model bert-base-chinese \
   --cache_dir ./data/bert_pretrain \
@@ -91,4 +91,9 @@ python bert_script/run_squad.py \
   --doc_stride 128 \
   --output_dir carbot_data/model/dbqa/
 
- '
+
+python eval/eval_dbqa.py
+python eval/eval_ner.py
+python eval/eval_kbqapc.py
+python eval/eval_kbqapm.py
+python eval/eval_kbqasp.py
